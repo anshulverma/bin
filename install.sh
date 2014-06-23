@@ -1,4 +1,5 @@
 #!/usr/bin/env sh
 
-echo "export PATH=\$PATH:$PWD/scripts  # add custom scripts" >> ~/.bashrc
+BASEDIR=$(dirname $0)
+echo "export PATH=\$PATH:$BASEDIR/scripts  # add custom scripts" >> ~/.bashr
 echo "success"
