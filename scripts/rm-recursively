@@ -1,0 +1,8 @@
+#!/usr/bin/env sh
+while true; do
+  read -p "Delete '$1' recursively from '`pwd`'? (y/n): " yn
+  case $yn in
+    [Yy]* ) rm -rf `find . -type d -name $1`; echo "done"; break;;
+    * ) exit;
+  esac
+done
