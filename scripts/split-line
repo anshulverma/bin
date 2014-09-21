@@ -1,0 +1,7 @@
+#!/bin/bash
+
+while IFS=' ' read -ra IN; do
+  for i in "${IN[@]}"; do
+    echo "$i"
+  done
+done <<< "$1"
