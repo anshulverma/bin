@@ -1,0 +1,11 @@
+#!/bin/bash
+
+this=`basename $0`
+pids=`ps -aex | grep -i $1 | grep -v grep | grep -v $this | cut -d' ' -f1`
+for pid in $pids; do
+  process=`ps -aex -o pid,command | grep -i $pid | grep -v grep | grep -v $this`
+  ports=`lsof -n -i4TCP | grep $pid | egrep 'TCP \*:[0-9]+' | cut -d' ' -f22 | cut -c 3- | tr '\n' ' '`
+  echo "process: $process"
+  echo "ports: $ports"
+  echo ""
+done
