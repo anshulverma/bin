@@ -1,0 +1,43 @@
+#!/usr/bin/env sh
+
+usage() {
+  echo "Usage: prepend -f <path>" 1>&2
+  exit 1
+}
+
+file=
+createIfNotFound=0
+while getopts "f:c" opt; do
+  case $opt in
+    f)
+      file=$OPTARG
+      ;;
+    c)
+      createIfNotFound=1
+      ;;
+    :)
+      echo "ERROR: Option '-$OPTARG' requires an argument." >&2
+      usage
+      ;;
+    *)
+      usage
+  esac
+done
+
+if [[ -z "$file" ]]; then
+  usage
+fi
+
+if [ ! -f $file ] && [ $createIfNotFound -eq 0 ]; then
+  echo "ERROR: File '$file' does not exist. Use '-c' option if you want to create a new file." >&2
+  exit 2
+fi
+
+touch $file
+tempFile=`mktemp`
+while read line; do
+  lines=(${lines[@]} $line)
+  echo $line >> $tempFile
+done
+cat $file >> $tempFile
+mv $tempFile $file
