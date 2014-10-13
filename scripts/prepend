@@ -1,7 +1,7 @@
 #!/usr/bin/env sh
 
 usage() {
-  echo "Usage: prepend -f <path>" 1>&2
+  echo "Usage: prepend [-c] -f <path>" 1>&2
   exit 1
 }
 
