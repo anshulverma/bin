@@ -1,0 +1,23 @@
+#!/bin/bash
+
+KEY_DIR_PATH="$HOME/.ssh/keys"
+mkdir -p $KEY_DIR_PATH
+
+ver=`date '+%m.%d.%Y'`
+key_file="$KEY_DIR_PATH/id_rsa.$ver"
+
+count=1
+key_file_path=$key_file
+while [ -f $key_file_path ]; do
+  echo $key_file_path
+  key_file_path="${key_file}_$count"
+  count=`expr $count + 1`
+done
+
+echo "Key file: $key_file_path"
+
+ssh-keygen -t rsa -f $key_file_path && \
+  ssh-add $key_file_path
+
+cat "${key_file_path}.pub" | pbcopy
+echo "Public key contents copied to clipboard"
