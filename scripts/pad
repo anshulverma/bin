@@ -1,0 +1,49 @@
+#!/usr/bin/env python
+
+import sys, getopt
+
+def main(argv):
+    paddingCharacter = '.'
+    inputStr = ''
+    length = 0
+    try:
+        opts, args = getopt.getopt(argv, "hc:l:",["help", "padding-character", "length"])
+    except getopt.GetoptError:
+        usage()
+        sys.exit(2)
+
+    for opt, arg in opts:
+        if opt in ('-h', '--help'):
+            usage()
+            sys.exit()
+        elif opt in ('-c', '--padding-character'):
+            paddingCharacter = arg
+        elif opt in ('-l', '--length'):
+            length = int(arg)
+
+        argv.remove(opt)
+        argv.remove(arg)
+
+    if (len(argv) > 1):
+         usage()
+         exit(1)
+
+    inputStr = argv[0]
+    inputLen = len(inputStr)
+    padLen   = length - inputLen
+
+    if (padLen < 0):
+        print inputStr
+        exit()
+
+    while (padLen > 0):
+        inputStr += paddingCharacter
+        padLen -= 1
+    print inputStr
+
+
+def usage():
+    print 'pad -c <padding-character> <input>'
+
+if __name__ == '__main__':
+    main(sys.argv[1:])
