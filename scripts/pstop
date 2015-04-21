@@ -1,0 +1,9 @@
+#!/usr/bin/env ruby
+
+def ps_top_cpu
+  system 'watch "ps aux | sort -k 3,3 -r | head -n 6"'
+rescue Interrupt
+  puts 'pstop finished'
+end
+
+ps_top_cpu
