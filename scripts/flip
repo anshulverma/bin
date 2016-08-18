@@ -1,4 +1,4 @@
 #!/usr/bin/env sh
 
 BASEDIR=$(dirname $0)
-perl $BASEDIR/../perl/flip.pl
+perl $BASEDIR/../lib/flip.pl
