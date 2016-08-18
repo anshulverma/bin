@@ -33,21 +33,22 @@ EOS
 
     handler do
       basedir = File.expand_path(File.dirname(File.dirname(__FILE__)))
-      raw_listing = `find #{Dir.pwd} -maxdepth #{depth} -exec stat --printf=\"%s %n \\n\" \"{}\" \\; | awk -f #{basedir}/lib/xdu.awk`
-      files = []
-      raw_listing.split("\n").each do |line|
-        files << FileInfo.new(line)
-      end
 
       min_size_bytes = to_bytes(option('min-size').to_s)
 
       format="%-10s%s\n"
       printf(format, "Size", "Name")
       printf(format, "----", "------------")
-      files
-        .sort
-        .select { |file| !file.is_dir and file.size > min_size_bytes }
-        .each { |file| printf(format, file.size_str, file.name) }
+      cmd = """
+            find #{Dir.pwd} -maxdepth #{depth} \
+                            -exec stat \
+                            --printf=\"%s %n \\n\" \"{}\" \\;
+            | awk -f #{basedir}/lib/xdu.awk
+            """
+      execute(cmd) do |line|
+        file = FileInfo.new(line)
+        printf(format, file.size_str, file.name) unless file.is_dir || file.size < min_size_bytes
+      end
     end
   end
 end
@@ -67,6 +68,20 @@ end
 def to_bytes(size)
   multiplier = SIZE_CONSTANTS[size[-1, 1]] / 1024
   size.to_i * multiplier
+end
+
+def execute(cmd, &block)
+  begin
+    PTY.spawn(cmd) do |stdout, stdin, pid|
+      begin
+        stdout.each(&block)
+      rescue Errno::EIO
+        puts "Errno:EIO error"
+      end
+    end
+  rescue PTY::ChildExited
+    puts "The child process exited!"
+end
 end
 
 class FileInfo
