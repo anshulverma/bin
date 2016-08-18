@@ -31,18 +31,27 @@ EOS
       default '0B'
     end
 
+    option :header do
+      description 'Turn off printing of header line'
+      type :boolean
+      default true
+    end
+
     handler do
       basedir = File.expand_path(File.dirname(File.dirname(__FILE__)))
 
       min_size_bytes = to_bytes(option('min-size').to_s)
 
       format="%-10s%s\n"
-      printf(format, "Size", "Name")
-      printf(format, "----", "------------")
+      if header.value
+        printf(format, "Size", "Name")
+        printf(format, "----", "------------")
+      end
+
       cmd = """
             find #{Dir.pwd} -maxdepth #{depth} \
                             -exec stat \
-                            --printf=\"%s %n \\n\" \"{}\" \\;
+                            --printf=\"%s %n\\n\" \"{}\" \\;
             | awk -f #{basedir}/lib/xdu.awk
             """
       execute(cmd) do |line|
