@@ -2,6 +2,7 @@
 
 require 'cliqr'
 require 'filesize'
+require 'pty'
 
 cli = Cliqr.interface do
   name 'xdu'
@@ -32,7 +33,7 @@ EOS
 
     handler do
       basedir = File.expand_path(File.dirname(File.dirname(__FILE__)))
-      raw_listing = `find #{Dir.pwd} -maxdepth #{depth} -exec ls -lasi \"{}\" \\; | awk -f #{basedir}/lib/xdu.awk`
+      raw_listing = `find #{Dir.pwd} -maxdepth #{depth} -exec stat --printf=\"%s %n \\n\" \"{}\" \\; | awk -f #{basedir}/lib/xdu.awk`
       files = []
       raw_listing.split("\n").each do |line|
         files << FileInfo.new(line)
@@ -71,8 +72,6 @@ end
 class FileInfo
   include Comparable
 
-  attr_accessor :blocks
-  attr_accessor :size_on_disk
   attr_accessor :size
   attr_accessor :size_str
   attr_accessor :name
@@ -80,17 +79,15 @@ class FileInfo
 
   def initialize(str)
     line = str.split
-    @blocks = line[0]
-    @size_on_disk = line[1]
-    @size = line[2].to_i
+    @size = line[0].to_i
     @size_str = to_size_str(size)
-    @name = line[3]
+    @name = line[1]
 
     @is_dir = File.directory?(name)
   end
 
   def to_s
-    "#{blocks} #{size_on_disk} #{size} #{name}"
+    "#{size} #{name}"
   end
 
   def <=>(other)

@@ -1,18 +1,16 @@
 #!/usr/bin/env awk -f
 
 {
-  if (NF != 11) {
-    next # ignore invalid ls output lines
+  if (NF != 2) {
+    next # ignore invalid input lines
   }
 
-  size = $7
+  size = $1
 
   if (size == 0) {
     next # ignore empty files
   }
 
-  size_on_disk = $2
-  blocks = $4
-  name = $11
-  print blocks, size_on_disk, size, name
+  name = $2
+  print size, name
 }
