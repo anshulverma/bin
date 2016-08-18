@@ -32,15 +32,23 @@ EOS
     end
 
     option :header do
-      description 'Turn off printing of header line'
+      description 'Turn off printing of header line.'
       type :boolean
       default true
+    end
+
+    option :limit do
+      short 'l'
+      description 'Limit output to N lines.'
+      type :numeric
+      default -1
     end
 
     handler do
       basedir = File.expand_path(File.dirname(File.dirname(__FILE__)))
 
       min_size_bytes = to_bytes(option('min-size').to_s)
+      line_count = limit.value
 
       format="%-10s%s\n"
       if header.value
@@ -56,7 +64,11 @@ EOS
             """
       execute(cmd) do |line|
         file = FileInfo.new(line)
-        printf(format, file.size_str, file.name) unless file.is_dir || file.size < min_size_bytes
+        unless (file.is_dir || file.size < min_size_bytes)
+          printf(format, file.size_str, file.name)
+          line_count -= 1 if line_count > 0
+        end
+        exit 0 if line_count == 0
       end
     end
   end
