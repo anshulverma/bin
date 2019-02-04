@@ -1,0 +1,12 @@
+#!/bin/bash
+
+BASEDIR="$HOME/.tmp/everstore"
+mkdir -p $BASEDIR
+tmpfile=$(mktemp "$BASEDIR/everstore-XXXXXX")
+echo $tmpfile
+
+HANDLE=$1
+
+everstore_get $tmpfile $HANDLE
+cat $tmpfile
+rm $tmpfile
